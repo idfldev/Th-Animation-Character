@@ -1,0 +1,5 @@
+{
+  "name": "Thọ Animation",
+  "description": "An application for creating consistent cartoon character images using AI. Users can upload reference character images, a background, and a prompt to generate new scenes.",
+  "requestFramePermissions": []
+}
