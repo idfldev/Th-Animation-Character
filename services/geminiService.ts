@@ -18,11 +18,25 @@ const base64ToGenaiparts = (base64: string): ImageDataPart => {
     };
 };
 
+const getAspectRatioPrompt = (ratio: string): string => {
+    switch (ratio) {
+        case '16:9': return ' The image must have a widescreen, cinematic 16:9 aspect ratio.';
+        case '9:16': return ' The image must have a vertical, portrait 9:16 aspect ratio, suitable for phone screens.';
+        case '4:3': return ' The image must have a landscape 4:3 aspect ratio.';
+        case '3:4': return ' The image must have a vertical 3:4 aspect ratio.';
+        case '1:1':
+        default:
+            return ' The image must have a square 1:1 aspect ratio.';
+    }
+}
+
 export const generateImages = async (
     prompt: string,
     characters: Character[],
     background: Background,
-    model: ModelName
+    model: ModelName,
+    numberOfImages: number,
+    aspectRatio: string,
 ): Promise<string[]> => {
 
     if (model === 'imagen-4.0-generate-001') {
@@ -33,9 +47,9 @@ export const generateImages = async (
                 model: 'imagen-4.0-generate-001',
                 prompt: fullPrompt,
                 config: {
-                  numberOfImages: 4,
+                  numberOfImages,
                   outputMimeType: 'image/png',
-                  aspectRatio: '1:1',
+                  aspectRatio,
                 },
             });
             return response.generatedImages.map(img => `data:image/png;base64,${img.image.imageBytes}`);
@@ -45,7 +59,8 @@ export const generateImages = async (
         }
     } else {
         // Gemini Flash Image uses reference images for character consistency
-        const fullPrompt = `Create a 4K, high-resolution, masterpiece-quality image based on the following description: "${prompt}".
+        const aspectRatioText = getAspectRatioPrompt(aspectRatio);
+        const fullPrompt = `Create a 4K, high-resolution, masterpiece-quality image based on the following description: "${prompt}".${aspectRatioText}
 Use the provided reference images for the characters.`;
 
         const parts: (TextPart | ImageDataPart)[] = [{ text: fullPrompt }];
@@ -79,8 +94,8 @@ Use the provided reference images for the characters.`;
             throw new Error("Image generation failed or API did not return an image.");
         };
 
-        // Generate 4 images in parallel
-        const imagePromises = Array(4).fill(0).map(() => generateSingleImage());
+        // Generate images in parallel based on numberOfImages
+        const imagePromises = Array(numberOfImages).fill(0).map(() => generateSingleImage());
         
         try {
             const results = await Promise.all(imagePromises);

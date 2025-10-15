@@ -9,11 +9,15 @@ interface ControlPanelProps {
   prompt: string;
   isLoading: boolean;
   selectedModel: ModelName;
+  numberOfImages: number;
+  aspectRatio: string;
   onCharacterChange: (id: number, image: string | null, selected?: boolean) => void;
   onBackgroundChange: (image: string | null) => void;
   onUseBackgroundToggle: () => void;
   onPromptChange: (value: string) => void;
   onModelChange: (model: ModelName) => void;
+  onNumberOfImagesChange: (value: number) => void;
+  onAspectRatioChange: (value: string) => void;
   onGenerate: () => void;
 }
 
@@ -23,11 +27,15 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   prompt,
   isLoading,
   selectedModel,
+  numberOfImages,
+  aspectRatio,
   onCharacterChange,
   onBackgroundChange,
   onUseBackgroundToggle,
   onPromptChange,
   onModelChange,
+  onNumberOfImagesChange,
+  onAspectRatioChange,
   onGenerate,
 }) => {
   return (
@@ -101,6 +109,36 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
          <p className="text-xs text-gray-400 mt-2">
             Lưu ý: Model Imagen 4 chỉ sử dụng câu lệnh, không dùng ảnh tham chiếu.
         </p>
+      </div>
+      
+      <div>
+        <h2 className="text-lg font-semibold mb-3 text-purple-300">Số lượng ảnh</h2>
+        <select
+          value={numberOfImages}
+          onChange={e => onNumberOfImagesChange(Number(e.target.value))}
+          className="w-full p-3 bg-gray-900 border border-gray-600 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+          disabled={isLoading}
+        >
+          <option value={1}>1 ảnh</option>
+          <option value={2}>2 ảnh</option>
+          <option value={4}>4 ảnh</option>
+        </select>
+      </div>
+
+      <div>
+        <h2 className="text-lg font-semibold mb-3 text-purple-300">Khung ảnh</h2>
+        <select
+          value={aspectRatio}
+          onChange={e => onAspectRatioChange(e.target.value)}
+          className="w-full p-3 bg-gray-900 border border-gray-600 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors"
+          disabled={isLoading}
+        >
+          <option value="1:1">Vuông (1:1)</option>
+          <option value="16:9">Ngang (16:9)</option>
+          <option value="9:16">Dọc (9:16)</option>
+          <option value="4:3">Ngang (4:3)</option>
+          <option value="3:4">Dọc (3:4)</option>
+        </select>
       </div>
 
       <button

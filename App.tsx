@@ -20,6 +20,8 @@ function App() {
   const [background, setBackground] = useState<Background>({ image: null, use: false });
   const [prompt, setPrompt] = useState<string>('');
   const [selectedModel, setSelectedModel] = useState<ModelName>('gemini-2.5-flash-image');
+  const [numberOfImages, setNumberOfImages] = useState<number>(4);
+  const [aspectRatio, setAspectRatio] = useState<string>('1:1');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [generatedImagesResult, setGeneratedImagesResult] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -70,7 +72,7 @@ function App() {
     setGeneratedImagesResult([]);
 
     try {
-      const result = await generateImages(prompt, selectedCharacters, background, selectedModel);
+      const result = await generateImages(prompt, selectedCharacters, background, selectedModel, numberOfImages, aspectRatio);
       setGeneratedImagesResult(result);
     } catch (e) {
       console.error(e);
@@ -78,7 +80,7 @@ function App() {
     } finally {
       setIsLoading(false);
     }
-  }, [prompt, characters, background, selectedModel]);
+  }, [prompt, characters, background, selectedModel, numberOfImages, aspectRatio]);
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-200 font-sans">
@@ -94,11 +96,15 @@ function App() {
             prompt={prompt}
             isLoading={isLoading}
             selectedModel={selectedModel}
+            numberOfImages={numberOfImages}
+            aspectRatio={aspectRatio}
             onCharacterChange={handleCharacterChange}
             onBackgroundChange={handleBackgroundChange}
             onUseBackgroundToggle={handleUseBackgroundToggle}
             onPromptChange={setPrompt}
             onModelChange={setSelectedModel}
+            onNumberOfImagesChange={setNumberOfImages}
+            onAspectRatioChange={setAspectRatio}
             onGenerate={handleGenerateClick}
           />
         </div>
